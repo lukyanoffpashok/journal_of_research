@@ -4,10 +4,7 @@
 
 1. Собеседование со Сбером
 2. Прочитана статья https://arxiv.org/pdf/1904.08779.pdf
-В статье предложен метод аугментатации, состоящий из
-1) Time warping
-2) Frequency masking
-3) Time masking
+В статье предложен метод аугментатации, состоящий из Time warping, Frequency masking и Time masking.
 Используется LAS (Listen, Attend and Spell) сети. Метод аугментации сводит проблему over-fitting к проблеме under-fitting.
 3. Ознакомился с https://mkegler.github.io/SpeechInpainting/, в частности https://arxiv.org/pdf/1910.09058.pdf (улучшение звука)
 4. Прочитана статья https://arxiv.org/pdf/1910.09909.pdf (извлечение признаков аудио)
