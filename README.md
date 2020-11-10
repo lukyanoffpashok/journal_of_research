@@ -35,8 +35,11 @@ https://arxiv.org/pdf/1910.09909.pdf
 2. Wav2vec
 https://arxiv.org/pdf/2006.11477.pdf
 Стратегия маскировки похожа на SpecAugment
+
 3. Speech Recognition
+
 Много статей именно по этой теме
+
 https://arxiv.org/pdf/1910.01493.pdf?fbclid=IwAR1pY5cvHTn0ljXIrYxeWB6yP-I0lIr6dFtMCcuDiT3Pn9dBLKdE1lxMVAo
 
 https://arxiv.org/pdf/1910.12977.pdf
@@ -44,14 +47,19 @@ https://arxiv.org/pdf/1910.12977.pdf
 https://arxiv.org/pdf/1910.09799.pdf (показана эффективность SpecAugment)
 
 https://arxiv.org/pdf/1911.01629.pdf
+
 4. SpeechInpainting
+
 https://mkegler.github.io/SpeechInpainting/
 
 https://www.isca-speech.org/archive/Interspeech_2020/pdfs/1532.pdf
 
 Используется SpeechVgg и SpecAugment
+
 5. Применение в аудиоклассификации
+
 Дополнительные статьи:
+
 https://arxiv.org/pdf/2002.03788.pdf - text to speech
 
 https://arxiv.org/pdf/2003.04298.pdf
