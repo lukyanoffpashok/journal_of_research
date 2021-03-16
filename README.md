@@ -77,3 +77,15 @@ https://arxiv.org/pdf/2003.04298.pdf
 
 Знакомство с новым контестом на kaggle по звуку. 
 Выступление по Speech Inpainting на семинаре по deep learning ВМК(презентация выложена).
+
+### Отчет 16.03.2021
+
+Участие в контесте kaggle "Rainforest Connection Species Audio Detection" (bronze).
+
+Для экспериментов с аугментацией было найдено 3 датасета с kaggle:
+
+1. Audio Speech Sentiment. https://www.kaggle.com/imsparsh/audio-speech-sentiment
+2. Audio MNIST. https://www.kaggle.com/alanchn31/free-spoken-digits
+3. Heartbeat Sounds. https://www.kaggle.com/kinguistics/heartbeat-sounds
+
+Датасет Audio Speech Sentiment не подходит, так как на тесте можно достичь accuracy = 1 и в аугментации смысла нет. Остальные 2 датасета, кажется, подходят для экспериментов. Для всех 3 датасетов были решены задачи классификации (код выложен). Также был реализован метод аугментации, похожий на SpecAugment (маскирование), только вместо зануления я использовал добавление шума. Однако он пока не дал улучшения (был эксперимент только на AudioMnist).
