@@ -115,4 +115,4 @@ Heartbeat Sounds:
 | RandomErasing   | 0.832           | 0.822          |
 | Shift           | 0.87            | 0.85           |
 
-Видно, что только shift augmentation дает улучшение на тестовой выборке. В случае Audio Mnist TimeMasking, FreqMasking дает улучшение на валидации, но не дает улучшение на тесте. К слову, в статье https://arxiv.org/pdf/2008.04590.pdf Shift augmentation также показало лучший результат.
+Видно, что только shift augmentation дает улучшение на тестовой выборке. В случае Audio Mnist TimeMasking, FreqMasking дают улучшение на валидации, но не дает улучшение на тесте. К слову, в статье https://arxiv.org/pdf/2008.04590.pdf Shift augmentation также показало лучший результат.
