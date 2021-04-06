@@ -89,3 +89,30 @@ https://arxiv.org/pdf/2003.04298.pdf
 3. Heartbeat Sounds. https://www.kaggle.com/kinguistics/heartbeat-sounds
 
 Датасет Audio Speech Sentiment не подходит, так как на тесте можно достичь accuracy = 1 и в аугментации смысла нет. Остальные 2 датасета, кажется, подходят для экспериментов. Для всех 3 датасетов были решены задачи классификации (код выложен). Также был реализован метод аугментации, похожий на SpecAugment (маскирование), только вместо зануления я использовал добавление шума. Однако он пока не дал улучшения (был эксперимент только на AudioMnist).
+
+### Отчет 06.04.2021
+
+Проведены эксперименты на датасетах AudioMnist и Heartbeat Sounds со следующими типами аугментации: TimeMasking, FreqMasking, Shift, Noise, RandomErasing.
+Результаты (кратко) представлены ниже
+
+Audio Mnist:
+| Аугментация     | Valid_accuracy  | Test_accuracy  |
+| --------------- |:---------------:| --------------:|
+| No augmentation | 0.972           | 0.966          |
+| TimeMasking     | 0.976           | 0.952          |
+| FreqMasking     | 0.974           | 0.962          |
+| Noise           | 0.97            | 0.96           |
+| RandomErasing   | 0.972           | 0.957          |
+| Shift           | 0.974           | 0.969          |
+
+Heartbeat Sounds:
+| Аугментация     | Valid_accuracy  | Test_accuracy  |
+| --------------- |:---------------:| --------------:|
+| No augmentation | 0.844           | 0.84           |
+| TimeMasking     | 0.844           | 0.827          |
+| FreqMasking     | 0.825           | 0.82           |
+| Noise           | 0.822           | 0.822          |
+| RandomErasing   | 0.832           | 0.822          |
+| Shift           | 0.87            | 0.85           |
+
+Видно, что только shift augmentation дает улучшение на тестовой выборке. В случае Audio Mnist TimeMasking, FreqMasking дает улучшение на валидации, но не дает улучшение на тесте. К слову, в статье https://arxiv.org/pdf/2008.04590.pdf Shift augmentation также показало лучший результат.
