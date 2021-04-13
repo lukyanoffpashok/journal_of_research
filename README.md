@@ -95,7 +95,7 @@ https://arxiv.org/pdf/2003.04298.pdf
 Проведены эксперименты на датасетах AudioMnist и Heartbeat Sounds со следующими типами аугментации: TimeMasking, FreqMasking, Shift, Noise, RandomErasing.
 Результаты (кратко) представлены ниже
 
-Audio Mnist:
+Audio Mnist - random seed 42:
 | Аугментация     | Valid_accuracy  | Test_accuracy  |
 | --------------- |:---------------:| --------------:|
 | No augmentation | 0.972           | 0.966          |
@@ -105,7 +105,7 @@ Audio Mnist:
 | RandomErasing   | 0.972           | 0.957          |
 | Shift           | 0.974           | 0.969          |
 
-Heartbeat Sounds:
+Heartbeat Sounds  - random seed 42:
 | Аугментация     | Valid_accuracy  | Test_accuracy  |
 | --------------- |:---------------:| --------------:|
 | No augmentation | 0.844           | 0.84           |
@@ -116,3 +116,29 @@ Heartbeat Sounds:
 | Shift           | 0.87            | 0.85           |
 
 Видно, что только shift augmentation дает улучшение на тестовой выборке. В случае Audio Mnist TimeMasking, FreqMasking дают улучшение на валидации, но не дает улучшение на тесте. К слову, в статье https://arxiv.org/pdf/2008.04590.pdf Shift augmentation также показало лучший результат.
+
+### Отчет 13.04.2021
+
+Применена аугментация LoudnessControl: value = min_value + lyamnda * (value - min_value). Однако в нашем случае это не имеет смысла, так как в нашем случае min_value = 0, значит, value = lyambda * value.
+
+На датасете Heartbeat Sounds проведены эксперименты с разными random seed (1 и 15, выбраны произвольно). В предыдущих экспериментых random seed = 42. Результаты представлены в таблице.
+
+Heartbeat Sounds - random seed 1:
+| Аугментация     | Valid_accuracy  | Test_accuracy  |
+| --------------- |:---------------:| --------------:|
+| No augmentation | 0.851           | 0.83           |
+| TimeMasking     | 0.848           | 0.84           |
+| FreqMasking     | 0.848           | 0.81           |
+| Noise           | 0.863           | 0.807          |
+| RandomErasing   | 0.86            | 0.807          |
+| Shift           | 0.876           | 0.85           |
+
+Heartbeat Sounds - random seed 15:
+| Аугментация     | Valid_accuracy  | Test_accuracy  |
+| --------------- |:---------------:| --------------:|
+| No augmentation | 0.81            | 0.838          |
+| TimeMasking     | 0.829           | 0.843          |
+| FreqMasking     | 0.825           | 0.838          |
+| Noise           | 0.829           | 0.84           |
+| RandomErasing   | 0.829           | 0.855          |
+| Shift           | 0.85            | 0.873          |
