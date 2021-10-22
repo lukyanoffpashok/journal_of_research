@@ -165,11 +165,17 @@ Heartbeat Sounds - random seed 15:
 
 Поиск возможных подходов к аугментации:
 1. MixUp подходы
+
 https://arxiv.org/pdf/2106.07085.pdf
+
 https://arxiv.org/pdf/2110.06126.pdf
 2. GAN-based подходы
+3. 
 https://arxiv.org/pdf/2109.09026.pdf
+
 https://arxiv.org/pdf/2108.00899.pdf
 3. Модификации SpecAugment
+
 https://arxiv.org/pdf/2103.16858.pdf
+
 https://arxiv.org/pdf/2110.00046.pdf
