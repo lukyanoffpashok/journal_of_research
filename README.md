@@ -242,3 +242,28 @@ HB - HeartBeatSounds
 ### Отчет 09.12.2021
 
 Продолжение работы над обзором литературы - Методы аугментации/Related Work.pdf
+
+### Отчет 13.02.2022
+
+Поиск статей по теме научной работы:
+
+1. Наиболее похожий алгоритм
+
+https://arxiv.org/pdf/2002.09024.pdf
+
+https://arxiv.org/pdf/2010.07092.pdf
+
+2. Поиск политики аугментации с помощью рл
+
+https://arxiv.org/pdf/1912.11188.pdf
+
+https://arxiv.org/pdf/1805.09501.pdf
+
+3. Случайная перестановка слов (RandomSwap) для аугментации текстов
+
+https://arxiv.org/pdf/1901.11196.pdf
+
+4. Циклический сдвиг (Waveform augmentation)
+
+https://arxiv.org/pdf/2110.04585.pdf
+
