@@ -255,6 +255,12 @@ https://arxiv.org/pdf/2010.07092.pdf
 
 http://www.cs.umd.edu/~yushen/docs/ICRA2021.pdf
 
+https://arxiv.org/pdf/2110.13771.pdf
+
+https://arxiv.org/pdf/2102.13262.pdf
+
+http://www.cs.umd.edu/~yushen/docs/NIPS2021.pdf
+
 2. Поиск политики аугментации с помощью рл
 
 https://arxiv.org/pdf/1912.11188.pdf
