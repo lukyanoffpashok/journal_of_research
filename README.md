@@ -253,6 +253,8 @@ https://arxiv.org/pdf/2002.09024.pdf
 
 https://arxiv.org/pdf/2010.07092.pdf
 
+http://www.cs.umd.edu/~yushen/docs/ICRA2021.pdf
+
 2. Поиск политики аугментации с помощью рл
 
 https://arxiv.org/pdf/1912.11188.pdf
