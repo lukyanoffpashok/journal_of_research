@@ -83,98 +83,111 @@
 
 Исследование методов аугментации данных актуально в настоящее время. Аугментация успешно используется при решении многих задач глубинного обучения, связанных с обработкой изображений, звуковых данных, текстов.
 
-В данной работе рассматриваются методы аугментации аудиоданных, а именно мел-спектрограмм. Мел-спектрограмма получается после применения оконного преобразования Фурье ~\cite{Fourier} и мел-фильтров ~\cite{MelScale}. Мел-спектрограммы представляют собой двумерные матрицы, поэтому их можно рассматривать как изображения и многие подходы к аугментации картинок применимы к аудиоданным. Например, метод Random Erasing ~\cite{RandomErasing}, сводящийся к вырезанию случайных прямоугольников из изображения, может быть использован в задаче аудиоклассификации  ~\cite{RandomErasingClassification}. Также в задаче классификации звуковых данных применяются такие методы аугментации, как Shift Augmentation ~\cite{AudioClassification} --- сдвиг мел-спектрограммы влево или вправо, Noise Augmentation ~\cite{AudioClassification} --- добавление Гауссовского шума, Loudness Augmentation ~\cite{AudioClassification} --- регулирование громкости, Speed augmentation ~\cite{AudioClassification} --- ускорение или замедление аудиозаписи.
+В данной работе рассматриваются методы аугментации аудиоданных, а именно мел-спектрограмм ~\cite{MelSpectrogram}. Мел-спектрограмма получается после применения оконного преобразования Фурье ~\cite{Fourier} к исходному сигналу и мел-фильтров ~\cite{MelScale}. Мел-спектрограммы представляют собой двумерные матрицы, поэтому их можно рассматривать как изображения и многие подходы к аугментации картинок применимы к аудиоданным. Например, метод Random Erasing ~\cite{RandomErasing}, сводящийся к вырезанию случайных прямоугольников из изображения, может быть использован в задаче аудиоклассификации  ~\cite{RandomErasingClassification}. Также в задаче классификации звуковых данных применяются такие методы аугментации, как Shift Augmentation ~\cite{AudioClassification} --- сдвиг мел-спектрограммы влево или вправо, Noise Augmentation ~\cite{AudioClassification} --- добавление Гауссовского шума, Loudness Augmentation ~\cite{AudioClassification} --- регулирование громкости, Speed augmentation ~\cite{AudioClassification} --- ускорение или замедление аудиозаписи.
 
 SpecAugment ~\cite{SpecAugment} --- один из наиболее известных методов аугментации аудиоданных, который показал свою эффективность в задаче автоматического распознавания речи. Политика аугментации SpecAugment определяется 3 возможными преобразованиями: 
 \begin{enumerate}
-    \item Time warping ~\cite{SpecAugment} (искривление времени)
-    \item Frequency masking ~\cite{SpecAugment} (зануление значений мел-спектрограммы внутри горизонтальной полосы)
-    \item Time masking ~\cite{SpecAugment} (зануление значений мел-спектрограммы внутри вертикальной полосы)
+    \item Time warping ~\cite{SpecAugment} (искривление времени),
+    \item Frequency masking ~\cite{SpecAugment} (зануление значений мел-спектрограммы внутри горизонтальной полосы),
+    \item Time masking ~\cite{SpecAugment} (зануление значений мел-спектрограммы внутри вертикальной полосы).
 \end{enumerate}
 В настоящее время известны некоторые модификации SpecAugment: SpliceOut ~\cite{SpliceOut}, SpecAugment++ ~\cite{SpecAugment++}.
 
-В данной работе рассматриваются методы аугментации, которые могут применяться "на лету" (онлайн-аугментация), т.е. преобразования мел-спектрограмм, соответствующие этим аугментациям, должны выполняться достаточно быстро.
+В данной работе рассматриваются методы аугментации, которые могут применяться «на лету» (онлайн-аугментация), т.е. преобразования мел-спектрограмм, соответствующие этим аугментациям, должны выполняться достаточно быстро.
 
 На практике выбирается некоторый набор заранее заданных методов аугментации. Пусть $N$ - число выбранных методов ($N \geq 1$). В процессе обучения чаще всего используются следующие стратегии применения методов аугментации:
 \begin{enumerate}
     \item к каждому объекту обучающей выборки применяются изначально или во время обучения все $N$ аугментаций. Таким образом, число используемых данных на каждой эпохе увеличивается в $N$ раз.
     \item преобразование, которое будет применено к конкретной мел-спектрограмме, выбирается случайным образом с вероятностью $\frac{1}{N}$ ~\cite{RandAugment}.
 \end{enumerate}
+
 Однако возможны и другие стратегии использования методов аугментации. В работе ~\cite{AutoAugment} оптимальная политика применения методов аугментации ищется с помощью методов обучения с подкреплением. В работе ~\cite{MaxUp} предлагается идея минимизации максимальных потерь среди аугментированных данных: \newline
-$\min_{\theta} E_{x \sim D} \max_i L(Augment_i(x), \theta)$, где \newline
-$D$ --- датасет, \newline
-$\theta$ --- параметры нейронной сети, \newline
-$L$ --- функция потерь, \newline
-$\{Augment_1, Augment_2, ..., Augment_n\}$ --- методы аугментации..
+$$\min_{\theta} E_{x \sim D} \max_i L(Augment_i(x), \theta),$$ где $D$ --- датасет,
+$\theta$ --- параметры нейронной сети, $L$ --- функция потерь, $\{Augment_1, Augment_2, ..., Augment_n\}$ --- методы аугментации.
 
-В данной работе предлагается метод аугментации SwapVerticalStripes, основанный на перестановке вертикальных полос в мел-спектрограмме, его модификации SwapNeighboringStripes, SwapSeveralStripes и алгоритм применения методов аугментации с выбором конкретного метода аугментации после каждой эпохи обучения.
-
+В данной работе предлагается метод аугментации SwapVerticalStripes, основанный на перестановке вертикальных полос в мел-спектрограмме, его модификации SwapNeighboringStripes, SwapSeveralStripes и алгоритм применения методов аугментации с выбором конкретного метода после каждой эпохи обучения.
 
 \section{Существующие методы аугментации}
-Ниже представлены известные подходы к аугментации аудиоданных, используемые в работе. 	
-\newline Здесь и далее считаем, что \newline FreqSize --- размерность мел-спектрограммы по частотной оси, \newline TimeSize --- размерность мел-спектрограммы по временной оси, \newline
-$S$ --- матрица значений мел-спектрограммы. \newline
+Здесь и далее считаем, что FreqSize --- размерность мел-спектрограммы по частотной оси, TimeSize --- размерность мел-спектрограммы по временной оси, $S$ --- матрица значений мел-спектрограммы. 
+
 Также введем матрицу $M(I, J)$, где $I, J$ --- множества индексов: \newline 
 \begin{equation*}
-M(I, J) = \{M(i, j)\} = 
+M(I, J) = \{M_{ij}\},  M_{ij} = 
 \begin{cases}
 0, & (i,j) \in I \times J,\\
 1, &\text{иначе}.
 \end{cases}
 \end{equation*}
-Стоит рассматривать только случаи, когда в представленных ниже аугментациях значения $t$, $f$, shift ненулевые. В противном случае ($t = 0$, или $f = 0$, или shift = 0) мел-спектрограмма никак не изменяется.
 
+В данной работе размерность матрицы $M(I, J)$ совпадает с размерностью матрицы значений мел-спектрограммы $S$. В представленных примерах матрица $S$ имеет размерность $128\times128$, однако, вообще говоря, эта матрица не является квадратной.
+
+Ниже представлены известные подходы к аугментации аудиоданных, используемые в работе.
 \begin{enumerate}
 	\item TimeMasking$^{\ref{fig:i5}}$ ~\cite{SpecAugment} \newline 
 	$t \sim U\{0, T\}, t_0 \sim U\{0, \text{TimeSize} - 1 - t\}$, $T$ - параметр аугментации. \newline 
 	В результате применения аугментации: \newline
 	$S \rightarrow S \cdot M(\{0, \ldots, \text{FreqSize} - 1\}, \{t_0, \ldots, t_0 + t - 1\}) $
-	\begin{figure}[ht!]
-		\center{\includegraphics[scale=0.9]{5_0.png}}
-		\caption{TimeMasking}
-		\label{fig:i5}
-	\end{figure}
 	\item FreqMasking$^{\ref{fig:i6}}$ ~\cite{SpecAugment} \newline
 	$f \sim U\{0, F\}, f_0 \sim U\{0, \text{FreqSize} - 1 - f\}$, $F$ - параметр аугментации. \newline
 	В результате применения аугментации: \newline
 	$S \rightarrow S \cdot M(\{f_0, \ldots, f_0 + f - 1\}, \{0, \ldots, \text{TimeSize} - 1\}) $
-	\begin{figure}[ht!]
+	\item Noise$^{\ref{fig:i7}}$ ~\cite{AudioClassification}  \newline 
+	К каждому значению в мел-спектрограмме добавляется $g \sim N(0, \sigma)$ (для каждого значения мел-спектрограммы генерируется свое g), где $\sigma$ - параметр аугментации (в данной работе $\sigma = 0.01$). 
+	\item TimeShift$^{\ref{fig:i8}}$ ~\cite{AudioClassification} \newline Сдвигаем все значения мел-спектрограммы относительно временной оси влево или вправо на |shift|, где $\text{shift} \sim U\{-\text{max\_shift}, \text{max\_shift}\}$, max\_shift - параметр аугментации. Направление сдвига определяется знаком shift: если \newline shift > 0, происходит сдвиг вправо, если shift < 0 - влево. Пустая область, образующаяся в результате сдвига, заполняется нулями.
+\end{enumerate}
+
+\begin{figure}[ht!]
+		\center{\includegraphics[scale=0.9]{5_0.png}}
+		\caption{TimeMasking}
+		\label{fig:i5}
+\end{figure}
+
+\begin{figure}[ht!]
 		\center{\includegraphics[scale=0.9]{6_0.png}}
 		\caption{FreqMasking}
 		\label{fig:i6}
-	\end{figure}
-	\item Noise$^{\ref{fig:i7}}$ ~\cite{AudioClassification}  \newline 
-	К каждому значению в мел-спектрограмме добавляется $g \sim N(0, \sigma)$ (для каждого значения мел-спектрограммы генерируется свое g), где $\sigma$ - параметр аугментации (в данной работе $\sigma = 0.01$). 
-	\begin{figure}[ht!]
-		\center{\includegraphics[scale=0.9]{7_0.png}}
-		\caption{Noise}
-		\label{fig:i7}
-	\end{figure}
-	\item TimeShift$^{\ref{fig:i8}}$ ~\cite{AudioClassification} \newline Сдвигаем все значения мел-спектрограммы относительно временной оси влево или вправо на |shift|, где $\text{shift} \sim U\{-\text{max\_shift}, \text{max\_shift}\}$, max\_shift - параметр аугментации. Направление сдвига определяется знаком shift: если \newline shift > 0, происходит сдвиг вправо, если shift < 0 - влево. Пустая область, образующаяся в результате сдвига, заполняется нулями.
-	\begin{figure}[ht!]
-		\center{\includegraphics[scale=0.9]{8_0.png}}
-		\caption{TimeShift}
-		\label{fig:i8}
-	\end{figure}
-\end{enumerate}
+\end{figure}
+
+Стоит рассматривать только случаи, когда в представленных выше аугментациях значения $t$, $f$, shift ненулевые. В противном случае ($t = 0$, или $f = 0$, или shift = 0) мел-спектрограмма никак не изменяется.
 
 В данной работе мел-спектрограммы нормализуются следующим образом: 
 
-$ value = \frac{value - mean}{std}$, где mean --- математическое ожидание значений мел-спектрограммы, std --- стандартное отклонение. 
+$$value = \frac{value - mean}{std},$$ где mean --- среднее арифметическое значений мел-спектрограммы, std --- стандартное отклонение. 
 
-Поэтому замена некоторых значений мел-спектрограммы на 0 в результате применения аугментации --- это замена на математическое ожидание.
+Поэтому замена некоторых значений мел-спектрограммы на 0 в результате применения аугментации --- это замена на оценку математического ожидания.
+
+\begin{figure}[ht!]
+		\center{\includegraphics[scale=0.9]{7_0.png}}
+		\caption{Noise}
+		\label{fig:i7}
+\end{figure}
+
+\begin{figure}[ht!]
+		\center{\includegraphics[scale=0.9]{8_0.png}}
+		\caption{TimeShift}
+		\label{fig:i8}
+\end{figure}
+
+\newpage
 
 \section{Предлагаемые подходы}
 
-\subsection{Методы аугментации, основанные на перестановке вертикальных полос в мел-спектрограмме}
+\subsection{Методы аугментации, основанные на перестановке вертикальных полос}
 
-Перестановка слов --- метод аугментации, используемый в задачах, связанных с обработкой текстов ~\cite{RandomSwap}. Подобная интуиция может быть применима и к звуковым данным. 
+В задачах, связанных с обработкой текстов, часто используют перестановку слов ~\cite{RandomSwap} в качестве аугментации. Подобная интуиция может быть применима и к звуковым данным. 
 
-В данной работе предлагается метод \textbf{SwapVerticalStripes}: $^{\ref{fig:i3}}$ \newline
-$t \sim U\{0, T\}, t_1 \sim U\{t, \text{TimeSize} - 1 - t\}, t_2 \sim U\{t, \text{TimeSize} - 1 - t\}, |t_1 - t_2| >= t $, \newline $T$ --- параметр аугментации. \newline 
-В результате применения аугментации: \newline
-$S[0:\text{FreqSize} - 1; t_1: t_1 + t - 1] \leftrightarrow S[0:\text{FreqSize} - 1; t_2 : t_2 + t - 1]$ \newline
-Идея метода заключается в перестановке произвольных вертикальных полос в мел-спектрограмме.
+Пусть $S_1, S_2$ --- подматрицы матрицы $S$ одинакового размера. Запись \newline $S_1 \leftrightarrow S_2$ --- обозначение перестановки подматриц $S_1, S_2$ в матрице $S$.
+
+В данной работе предлагается метод аугментации \textbf{SwapVerticalStripes}$^{\ref{fig:i3}}$:
+
+$T$ --- параметр аугментации. В результате применения метода: 
+\begin{enumerate}
+    \item $t \sim U\{0, T\}, t_1 \sim U\{t, \text{TimeSize} - 1 - t\}, t_2 \sim U\{t, \text{TimeSize} - 1 - t\}, |t_1 - t_2| \geq t.$
+    \item $S[0:\text{FreqSize} - 1; t_1: t_1 + t - 1] \leftrightarrow S[0:\text{FreqSize} - 1; t_2 : t_2 + t - 1]$.
+\end{enumerate}
+
+Идея аугментации заключается в перестановке произвольных непересекающихся вертикальных полос в мел-спектрограмме.
+
 \begin{figure}[ht!]
 	\center{\includegraphics[scale=0.9]{3_0.png}}
 	\caption{SwapVerticalStripes}
@@ -185,21 +198,27 @@ $S[0:\text{FreqSize} - 1; t_1: t_1 + t - 1] \leftrightarrow S[0:\text{FreqSize} 
 SwapVerticalStripes:
 
 \begin{enumerate}
-    \item \textbf{SwapNeighboringStripes} $^{\ref{fig:i1}}$ \newline
-        $t \sim U\{0, T\}, t_0 \sim U\{t, \text{TimeSize} - 1 - t\}$, $T$ --- параметр аугментации. \newline
-    	В результате применения аугментации: \newline
-    	$S[0:\text{FreqSize} - 1; t_0: t_0 + t - 1] \leftrightarrow S[0:\text{FreqSize} - 1; t_0 - t: t_0 - 1]$ \newline Идея предлагаемого метода SwapNeighboringStripes заключается в перестановке cоседних вертикальных полос.
+    \item \textbf{SwapNeighboringStripes}$^{\ref{fig:i1}}$ \newline
+        $T$ --- параметр метода. В результате применения аугментации:
+        \begin{enumerate}
+            \item $t \sim U\{0, T\}, t_0 \sim U\{t, \text{TimeSize} - 1 - t\}.$
+            \item $S[0:\text{FreqSize} - 1; t_0: t_0 + t - 1] \leftrightarrow S[0:\text{FreqSize} - 1; t_0 - t: t_0 - 1].$
+        \end{enumerate}
+        Идея предлагаемого метода SwapNeighboringStripes заключается в перестановке соседних вертикальных полос.
     	\begin{figure}[ht!]
     	\center{\includegraphics[scale=0.9]{1_0.png}}
     	\caption{SwapNeighboringStripes}
     	\label{fig:i1}
         \end{figure}
     \item \textbf{SwapSeveralStripes} $^{\ref{fig:i2}}$ \newline
-        $T, N$ --- параметры аугментации \newline
-        $n \sim U\{0, N\}$ \newline
-    	В результате применения аугментации (процедура повторяется $n$ раз): \newline
-    	$T_0 = \lfloor \frac{T}{n} \rfloor$ \newline
-    	$t \sim U\{0, T\}, t_1 \sim U\{t, \text{TimeSize} - 1 - t\}, t_2 \sim U\{t, \text{TimeSize} - 1 - t\}, |t_1 - t_2| >= t $ \newline Идея предлагаемого метода SwapSeveralStripes заключается в перестановке нескольких вертикальных полос.
+        $T, N$ --- параметры метода, \newline
+        $n \sim U\{0, N\}$. \newline
+    	В результате применения аугментации (процедура повторяется $n$ раз):
+    	\begin{enumerate}
+    	    \item $T_0 = \lfloor \frac{T}{n} \rfloor$, $t \sim U\{0, T_0\}, t_1 \sim U\{t, \text{TimeSize} - 1 - t\},$ \newline $t_2 \sim U\{t, \text{TimeSize} - 1 - t\}$.
+    	    \item $S[0:\text{FreqSize} - 1; t_1: t_1 + t - 1] \leftrightarrow S[0:\text{FreqSize} - 1; t_2 : t_2 + t - 1]$
+    	\end{enumerate}
+    	Идея предлагаемого метода SwapSeveralStripes заключается в перестановке нескольких вертикальных полос, при этом допускается пересечение этих полос.
     	\begin{figure}[ht!]
     	\center{\includegraphics[scale=0.9]{2_0.png}}
     	\caption{SwapSeveralStripes}
@@ -207,8 +226,8 @@ SwapVerticalStripes:
         \end{figure}
 \end{enumerate}
 
-
-\subsection{Алгоритм применения методов аугментации с выбором конкретного метода аугментации после каждой эпохи обучения}
+\newpage
+\subsection{Алгоритм применения методов аугментации}
 
 Введем следующую операцию: \newline
 $\text{Augmentation}(X) = \{\text{Augmentation}(x) \ \forall x \in X\}$, где $X$ --- датасет, \newline $\text{Augmentation}$ --- метод аугментации.
@@ -236,9 +255,11 @@ $\text{Augmentation}(X) = \{\text{Augmentation}(x) \ \forall x \in X\}$, где 
 \end{algorithmic}
 \end{algorithm}
 
-Идея предлагаемого подхода заключается в следующем: в конце n-ой эпохи обучения выбирается метод аугментации, на котором модель нейронной сети работает хуже всего, и далее выбранный метод используется в процессе обучения на n + 1 эпохе.
+Идея предлагаемого подхода заключается в следующем: в конце m-й эпохи обучения выбирается тот метод аугментации, при применении которого к валидационной выборке модель нейронной сети показывает самое низкое качество классификации на этом аугментированном датасете, и далее выбранный метод используется в процессе обучения на $(m + 1)$-й эпохе.
 
-Стоит отметить, что в работе ~\cite{NearestAlgorithm} подобная идея используется для нахождения "худшего" \ с точки зрения метрика качества на валидационной выборке параметра аугментации, используемого в процессе обучения. 
+Стоит отметить, что в работе ~\cite{NearestAlgorithm} подобная идея используется для нахождения «худшего» \ с точки зрения метрика качества на валидационной выборке параметра аугментации, используемого в процессе обучения. 
+
+Предлагаемый алгоритм применения методов аугментации приводит к увеличению времени обучения нейронной сети по сравнению с RandAugment ~\cite{RandAugment}, так как для выбора метода аугментации в конце каждой эпохи необходимо вычислить значение метрики качества классификации на аугментированном валидационном датасете $(Augment_i(X_{val})$ для всех $i = \overline{1,n}$, где $n$ --- число используемых методов аугментации. В данной работе $n = 5$.
 
 \newpage
 \section{Вычислительные эксперименты}
@@ -251,7 +272,6 @@ $\text{Augmentation}(X) = \{\text{Augmentation}(x) \ \forall x \in X\}$, где 
 
 Датасет Audio MNIST ~\cite{AudioMnistArticle}~\cite{AudioMnistKaggle} состоит из 3000 записей (файлов формата .wav), на которых некоторый человек произносит одну из 10 цифр. Соответственно, задача классификации заключается в том, чтобы определить какую конкретно цифру произносит человек на записи. В данной работе использовалась версия датасета на kaggle ~\cite{AudioMnistKaggle}.
 
-	
 В этих датасетах оставлены только корректно считываемые записи, длина которых больше некоторого порогового значения. Из оставшихся файлов в каждом датасете были извлечены фиксированные по длине куски записи (это необходимо для того, чтобы мел-спектрограммы были одного размера), при этом в случае датасета HeartBeatSounds ~\cite{HeartbeatSoundsArticle}~\cite{HeartbeatSoundsKaggle} из одного файла в зависимости от длины записи могло быть извлечено несколько непересекающихся кусков.
 
 Ниже представлено количество элементов в каждом классе в каждом из трех датасетов после предобработки данных:
@@ -259,46 +279,53 @@ $\text{Augmentation}(X) = \{\text{Augmentation}(x) \ \forall x \in X\}$, где 
 \begin{itemize}
     \item HeartBeatSounds ~\cite{HeartbeatSoundsArticle}~\cite{HeartbeatSoundsKaggle}
     \begin{enumerate}
-        \item normal --- 1296
-        \item murmur --- 500
-        \item extrastole --- 172
+        \item Normal --- 1296.
+        \item Murmur --- 500.
+        \item Extrastole --- 172.
     \end{enumerate}
     \item GTZAN ~\cite{GTZAN_Article}~\cite{GTZAN_kaggle}
     \begin{enumerate}
-        \item blues --- 100
-        \item classical --- 100
-        \item country --- 100
-        \item disco --- 100
-        \item hip hop --- 100
-        \item jazz --- 99
-        \item metal --- 100
-        \item pop --- 100
-        \item reggae --- 100
-        \item rock --- 100
+        \item Blues --- 100.
+        \item Classical --- 100.
+        \item Country --- 100.
+        \item Disco --- 100.
+        \item Hip hop --- 100.
+        \item Jazz --- 99.
+        \item Metal --- 100.
+        \item Pop --- 100.
+        \item Reggae --- 100.
+        \item Rock --- 100.
     \end{enumerate}
     \item Audio MNIST ~\cite{AudioMnistArticle}~\cite{AudioMnistKaggle}
     \begin{enumerate}
-        \item 0 --- 300
-        \item 1 --- 289
-        \item 2 --- 284
-        \item 3 --- 278
-        \item 4 --- 294
-        \item 5 --- 299
-        \item 6 --- 263
-        \item 7 --- 300
-        \item 8 --- 297
-        \item 9 --- 299
+        \item 0 --- 300.
+        \item 1 --- 289.
+        \item 2 --- 284.
+        \item 3 --- 278.
+        \item 4 --- 294.
+        \item 5 --- 299.
+        \item 6 --- 263.
+        \item 7 --- 300.
+        \item 8 --- 297.
+        \item 9 --- 299.
     \end{enumerate}
 \end{itemize}
 
-В случае датасетов GTZAN ~\cite{GTZAN_Article}~\cite{GTZAN_kaggle} и Audio MNIST ~\cite{AudioMnistArticle}~\cite{AudioMnistKaggle} нет явного дисбаланса классов, поэтому в задачах классификации с этими датасетами использовалась простая в интерпретации метрика качества --- процент верно классифицированных объектов. В случае датасета HeartBeatSounds ~\cite{HeartbeatSoundsArticle}~\cite{HeartbeatSoundsKaggle} присутствует дисбаланс классов, поэтому дополнительно к указанной выше метрике использовалась учитывающая дисбаланс классов метрика качества --- сбалансированная точность. В данной работе использовались модели нейронных сетей resnet18 ~\cite{Resnet}, resnet50 ~\cite{Resnet} и алгоритм оптимизации Adam ~\cite{Adam}. В рамках экспериментов нейронная сеть обучается 100 эпох. Функция потерь --- кросс-энтропия. 
-	
+В случае датасетов GTZAN ~\cite{GTZAN_Article}~\cite{GTZAN_kaggle} и Audio MNIST ~\cite{AudioMnistArticle}~\cite{AudioMnistKaggle} нет явного дисбаланса классов, поэтому в задачах классификации с этими датасетами использовалась простая в интерпретации метрика качества --- процент верно классифицированных объектов. В случае датасета HeartBeatSounds ~\cite{HeartbeatSoundsArticle}~\cite{HeartbeatSoundsKaggle} присутствует дисбаланс классов, поэтому дополнительно к указанной выше метрике использовалась учитывающая дисбаланс классов метрика качества --- сбалансированная точность. В данной работе использовались модели нейронных сетей resnet18 ~\cite{Resnet}, resnet50 ~\cite{Resnet} и алгоритм оптимизации Adam ~\cite{Adam}. В рамках экспериментов нейронная сеть обучается 100 эпох. Функция потерь --- кросс-энтропия. Ниже представлен процесс обучения$^{\ref{fig:i10}}$ модели нейронной сети resnet18 на датасете HeartBeatSounds ~\cite{HeartbeatSoundsArticle}~\cite{HeartbeatSoundsKaggle} без использования аугментации при random\_seed $= 1$.
+
+\begin{figure}[ht!]
+\center{\includegraphics[scale=0.55]{10_0.png}}
+\caption{Пример процесса обучения}
+\label{fig:i10}
+\end{figure}
+
+\newpage
 В данной работе значения параметров для всех типов аугментаций, где используются эти параметры, считаем равными: 
 \begin{itemize}
-    \item $F = \lfloor 0.2 \cdot \text{FreqSize} \rfloor$
-    \item $T = \lfloor 0.2 \cdot \text{TimeSize} \rfloor$
-    \item max\_shift = $\lfloor 0.2 \cdot \text{TimeSize} \rfloor$
-    \item $N = 4$
+    \item $F = \lfloor 0.2 \cdot \text{FreqSize} \rfloor$,
+    \item $T = \lfloor 0.2 \cdot \text{TimeSize} \rfloor$,
+    \item max\_shift = $\lfloor 0.2 \cdot \text{TimeSize} \rfloor$,
+    \item $N = 4$.
 \end{itemize}
 
 Датасеты разбиваются на train\_valid и test в отношении 4 : 1. train\_valid, в свою очередь, разбивается на train и valid в том же отношении. Обучение происходит на выборке train. После обучения берется лучший по метрике результат на валидационной выборке valid и считается метрика на тестовой выборке test. Именно по метрике качества на тестовой выборке оценивается эффективность методов аугментации.
@@ -306,6 +333,8 @@ $\text{Augmentation}(X) = \{\text{Augmentation}(x) \ \forall x \in X\}$, где 
 Датасеты разбиваются на train, valid и test при 5 разных фиксированных random\_seed. Результаты, соответственно, усредняются. В процессе обучения аугментация применяется с вероятностью $\frac{1}{2}$ к каждому сэмплу в каждом батче.
 
 В качестве методов аугментации для исследования применимости предлагаемого алгоритма был выбран набор из 5 методов: TimeMasking$^{\ref{fig:i5}}$ ~\cite{SpecAugment}, FreqMasking$^{\ref{fig:i6}}$ ~\cite{SpecAugment}, Noise$^{\ref{fig:i7}}$ ~\cite{AudioClassification}, TimeShift$^{\ref{fig:i8}}$ ~\cite{AudioClassification}, SwapVerticalStripes$^{\ref{fig:i3}}$. В рамках экспериментов проводится сравнение предлагаемого алгоритма с RandAugment ~\cite{RandAugment}.
+
+Реализация предлагаемых методов аугментации, предлагаемого алгоритма и вычислительные эксперименты представлены в ~\cite{Experiments}.
 
 \subsection{Результаты экспериментов}
 
@@ -366,6 +395,8 @@ $\text{Augmentation}(X) = \{\text{Augmentation}(x) \ \forall x \in X\}$, где 
 	\label{table:lukianov_pavel_t2}
 \end{table}
 
+\newpage
+
 \begin{table}[ht!]
     \centering
 	\begin{tabular}{| l | l | c |}
@@ -418,64 +449,72 @@ $\text{Augmentation}(X) = \{\text{Augmentation}(x) \ \forall x \in X\}$, где 
 	\label{table:lukianov_pavel_t3}
 \end{table}
 
+
 \newpage
 \subsection{Анализ полученных результатов}
 
 Результаты экспериментов показывают:
 
-\begin{itemize}
-    \item В случае датасета Audio MNIST ~\cite{AudioMnistArticle}~\cite{AudioMnistKaggle} с помощью предлагаемых методов SwapVerticalStripes, SwapNeighboringStripes, SwapSeveralStripes и предлагаемого алгоритма применения методов аугментации не удалось получить улучшения в качестве. Стоит отметить, что это может быть связано с особенностью данных или с тем, что и без использования аугментации удается достичь хорошего качества
+\begin{enumerate}
+    \item В случае датасета Audio MNIST ~\cite{AudioMnistArticle}~\cite{AudioMnistKaggle} с помощью предлагаемых методов SwapVerticalStripes, SwapNeighboringStripes, SwapSeveralStripes и предлагаемого алгоритма применения методов аугментации не удалось получить улучшения в качестве. Стоит отметить, что это может быть связано с особенностью данных или с тем, что и без использования аугментации удается достичь хорошего качества.
     \item Использование предлагаемого метода SwapVerticalStripes позволило получить прирост в качестве в задачах аудиоклассификации Heartbeat Sounds Classification
-    ~\cite{HeartbeatSoundsArticle}~\cite{HeartbeatSoundsKaggle} (за исключением случая использования resnet50 в качестве нейронной сети и сбалансированной точности в качестве метрики качества) и GTZAN Classification ~\cite{GTZAN_Article}~\cite{GTZAN_kaggle}
+    ~\cite{HeartbeatSoundsArticle}~\cite{HeartbeatSoundsKaggle} (за исключением случая использования resnet50 в качестве нейронной сети и сбалансированной точности в качестве метрики качества) и GTZAN Classification ~\cite{GTZAN_Article}~\cite{GTZAN_kaggle}.
     \item Использование предлагаемого метода SwapSeveralStripes позволило получить прирост в качестве в задаче аудиоклассификации Heartbeat Sounds Classification
-    ~\cite{HeartbeatSoundsArticle}~\cite{HeartbeatSoundsKaggle}, а также в задаче аудиоклассификации  GTZAN Classification ~\cite{GTZAN_Article}~\cite{GTZAN_kaggle} при использовании resnet18 в качестве нейронной сети
-    \item Предлагаемый метод SwapNeighboringStripes показал менее стабильные результаты, чем SwapVerticalStripes и SwapSeveralStripes, однако с его помощью в некоторых случаях можно получить прирост в качестве
-    \item В задаче аудиоклассификации Heartbeat Sounds Classification ~\cite{HeartbeatSoundsArticle}~\cite{HeartbeatSoundsKaggle} показано существенное преимущество предлагаемого алгоритма применения методов аугментации над RandAugment ~\cite{RandAugment}
-    \item В случае датасета GTZAN ~\cite{GTZAN_Article}~\cite{GTZAN_kaggle} предлагаемый алгоритм позволил получить прирост в качестве относительно RandAugment ~\cite{RandAugment} при использовании модели нейронной сети resnet18, однако в случае resnet50 наблюдается снижение качества не только по сравнению с RandAugment ~\cite{RandAugment}, но и по сравнению с тем случаем, когда обучение нейронной сети происходит без аугментации
-\end{itemize}
+    ~\cite{HeartbeatSoundsArticle}~\cite{HeartbeatSoundsKaggle}, а также в задаче аудиоклассификации  GTZAN Classification ~\cite{GTZAN_Article}~\cite{GTZAN_kaggle} при использовании resnet18 в качестве нейронной сети.
+    \item Предлагаемый метод SwapNeighboringStripes показал менее стабильные результаты, чем SwapVerticalStripes и SwapSeveralStripes, однако с его помощью в некоторых случаях можно получить прирост в качестве.
+    \item В задаче аудиоклассификации Heartbeat Sounds Classification ~\cite{HeartbeatSoundsArticle}~\cite{HeartbeatSoundsKaggle} показано существенное преимущество предлагаемого алгоритма применения методов аугментации над RandAugment ~\cite{RandAugment}.
+    \item В случае датасета GTZAN ~\cite{GTZAN_Article}~\cite{GTZAN_kaggle} предлагаемый алгоритм позволил получить прирост в качестве относительно RandAugment ~\cite{RandAugment} при использовании модели нейронной сети resnet18, однако в случае resnet50 наблюдается снижение качества не только по сравнению с RandAugment ~\cite{RandAugment}, но и по сравнению с тем случаем, когда обучение нейронной сети происходит без аугментации.
+    \item В рамках экспериментов предлагаемый алгоритм применения методов аугментации приводит к увеличению времени обучения нейронной сети примерно в $1.4$ раза по сравнению с RandAugment ~\cite{RandAugment}.
+\end{enumerate}
 
 \section{Заключение}
 
 В процессе выполнения работы получены следующие результаты:
 
 \begin{itemize}
-    \item Предложен и реализован метод аугментации аудиоданных SwapVerticalStripes, основанный на перестановке вертикальных полос в мел-спектрограмме, а также его модификации SwapNeighboringStripes, SwapSeveralStripes 
-    \item Проведены вычислительные эксперименты, показывающие возможную применимость предложенного метода SwapVerticalStripes и его модификаций в задаче аудиоклассификации
-    \item Предложен и реализован алгоритм применения методов аугментации аудиоданных с выбором конкретного метода аугментации после каждой эпохи обучения
-    \item Проведены вычислительные, показывающие преимущество предложенного алгоритма над алгоритмом RandAugment ~\cite{RandAugment} в задаче аудиоклассификации Heartbeat Sounds Classification ~\cite{HeartbeatSoundsArticle}~\cite{HeartbeatSoundsKaggle}
+    \item предложен и реализован метод аугментации аудиоданных SwapVerticalStripes, основанный на перестановке вертикальных полос в мел-спектрограмме, а также его модификации SwapNeighboringStripes, SwapSeveralStripes,
+    \item проведены вычислительные эксперименты, показывающие возможную применимость предложенного метода SwapVerticalStripes и его модификаций в задаче аудиоклассификации,
+    \item предложен и реализован алгоритм применения методов аугментации аудиоданных с выбором конкретного метода аугментации после каждой эпохи обучения,
+    \item проведены вычислительные, показывающие существенное преимущество предложенного алгоритма над алгоритмом RandAugment ~\cite{RandAugment} в задаче аудиоклассификации Heartbeat Sounds Classification ~\cite{HeartbeatSoundsArticle}~\cite{HeartbeatSoundsKaggle}.
 \end{itemize}
 
+По результатам работы сделан доклад на международной научной конференции
+студентов, аспирантов и молодых ученых «Ломоносов-2022» ~\cite{Lomonosov}.
+
+\newpage
 \begin{thebibliography}{3}
     \addcontentsline{toc}{section}{\bibname}
+    \bibitem{MelSpectrogram}
+    \url{https://librosa.org/doc/main/generated/librosa.feature.melspectrogram.html}
     \bibitem{Fourier}
-    \textit{Harris F.} On the Use of Windows for Harmonic Analysis With the Discrete Fourier Transform // \textit{In Proceedings of the IEEE, Jan. 1978, Vol. 66, Num. 1, 51-83}.
+    \textit{Harris F.} On the Use of Windows for Harmonic Analysis With the Discrete Fourier Transform // \textit{In Proceedings of the IEEE, Jan. 1978, Vol. 66, Num. 1, 51--83}.
     \bibitem{MelScale}
     \url{https://librosa.org/doc/main/generated/librosa.filters.mel.html}
 	\bibitem{RandomErasing}
-	\textit{Zhun Zhong, Liang Zheng, Guoliang Kang, Shaozi Li, Yi Yang}. Random Erasing Data Augmentation // \textit{arXiv preprint arXiv:1708.04896.} - 2017.
+	\textit{Zhun Zhong, Liang Zheng, Guoliang Kang, Shaozi Li, Yi Yang}. Random Erasing Data Augmentation // \textit{arXiv preprint arXiv:1708.04896.} --- 2017.
 	\bibitem{RandomErasingClassification}
 	\textit{Haiwei Wu, Lin Zhang, Lin Yang, Xuyang Wang, Junjie Wang, Dong Zhang, Ming Li}. Mask Detection and Breath Monitoring from Speech: on Data Augmentation,
-	Feature Representation and Modeling // \textit{arXiv preprint arXiv:2008.05175.} - 2020.
+	Feature Representation and Modeling // \textit{arXiv preprint arXiv:2008.05175.} --- 2020.
 	\bibitem{AudioClassification}
 	\textit{Steffen Illium, Robert Muller, Andreas Sedlmeier and Claudia Linnhoff-Popien}. Surgical Mask Detection with Convolutional Neural Networks and Data
-	Augmentations on Spectrograms // \textit{arXiv preprint arXiv:2008.04590.} - 2020.
+	Augmentations on Spectrograms // \textit{arXiv preprint arXiv:2008.04590.} --- 2020.
 	\bibitem{SpecAugment}
 	\textit{Daniel S. Park, William Chan, Yu Zhang, Chung-Cheng Chiu, Barret Zoph, Ekin D. Cubuk, Quoc V. Le}. SpecAugment: A Simple Data Augmentation Method
-	for Automatic Speech Recognition // \textit{arXiv preprint arXiv:1904.08779.} - 2019.
+	for Automatic Speech Recognition // \textit{arXiv preprint arXiv:1904.08779.} --- 2019.
 	\bibitem{SpliceOut}
-	\textit{Arjit Jain, Pranay Reddy Samala, Deepak Mittal, Preethi Jyoti, Maneesh Singh}. SpliceOut: A Simple and Efficient Audio Augmentation Method // \textit{arXiv preprint arXiv:2110.00046.} - 2021.
+	\textit{Arjit Jain, Pranay Reddy Samala, Deepak Mittal, Preethi Jyoti, Maneesh Singh}. SpliceOut: A Simple and Efficient Audio Augmentation Method // \textit{arXiv preprint arXiv:2110.00046.} --- 2021.
 	\bibitem{SpecAugment++}
-	\textit{Helin Wang, Yuexian Zou, Wenwu Wang}. SpecAugment++: A Hidden Space Data Augmentation Method for Acoustic Scene Classification // \textit{arXiv preprint arXiv:2103.16858.} - 2021.
+	\textit{Helin Wang, Yuexian Zou, Wenwu Wang}. SpecAugment++: A Hidden Space Data Augmentation Method for Acoustic Scene Classification // \textit{arXiv preprint arXiv:2103.16858.} --- 2021.
 	\bibitem{RandAugment}
-	\textit{Ekin D. Cubuk, Barret Zoph, Jonathon Shlens, Quoc V. Le}. RandAugment: Practical automated data augmentation with a reduced search space // \textit{arXiv preprint arXiv:1909.13719.} - 2019.
+	\textit{Ekin D. Cubuk, Barret Zoph, Jonathon Shlens, Quoc V. Le}. RandAugment: Practical automated data augmentation with a reduced search space // \textit{arXiv preprint arXiv:1909.13719.} --- 2019.
 	\bibitem{AutoAugment}
-	\textit{Ekin D. Cubuk, Barret Zoph, Dandelion Mane, Vijay Vasudevan, Quoc V. Le}. AutoAugment: Learning Augmentation Policies from Data // \textit{arXiv preprint arXiv:1805.09501.} - 2018.
+	\textit{Ekin D. Cubuk, Barret Zoph, Dandelion Mane, Vijay Vasudevan, Quoc V. Le}. AutoAugment: Learning Augmentation Policies from Data // \textit{arXiv preprint arXiv:1805.09501.} --- 2018.
 	\bibitem{MaxUp}
-	\textit{Chengyue Gong, Tongzheng Ren, Mao Ye, Qiang Liu}. MaxUp: A Simple Way to Improve Generalization of Neural Network Training // \textit{arXiv preprint arXiv:2002.09024.} - 2020.
+	\textit{Chengyue Gong, Tongzheng Ren, Mao Ye, Qiang Liu}. MaxUp: A Simple Way to Improve Generalization of Neural Network Training // \textit{arXiv preprint arXiv:2002.09024.} --- 2020.
 	\bibitem{RandomSwap}
-	\textit{Jason Wei, Kai Zou}. EDA: Easy Data Augmentation Techniques for Boosting Performance on Text Classification Tasks // \textit{arXiv preprint arXiv:1901.11196.} - 2019.
+	\textit{Jason Wei, Kai Zou}. EDA: Easy Data Augmentation Techniques for Boosting Performance on Text Classification Tasks // \textit{arXiv preprint arXiv:1901.11196.} --- 2019.
 	\bibitem{NearestAlgorithm}
-	\textit{Yu Shen, Laura Zheng, Manli Shu, Weizi Li, Tom Goldstein, Ming C. Lin}. Improving Robustness of Learning-based Autonomous Steering Using Adversarial Images // \textit{arXiv preprint arXiv:2102.13262.} - 2021.
+	\textit{Yu Shen, Laura Zheng, Manli Shu, Weizi Li, Tom Goldstein, Ming C. Lin}. Improving Robustness of Learning-based Autonomous Steering Using Adversarial Images // \textit{arXiv preprint arXiv:2102.13262.} --- 2021.
 	\bibitem{HeartbeatSoundsArticle}
 	\textit{Bentley, P. and Nordehn, G. and Coimbra, M. and Mannor, S.} The {PASCAL} {C}lassifying {H}eart {S}ounds {C}hallenge 2011 {(CHSC2011)} {R}esults. --- 2011.
 	\url{http://www.peterjbentley.com/heartchallenge/index.html}
@@ -496,9 +535,14 @@ $\text{Augmentation}(X) = \{\text{Augmentation}(x) \ \forall x \in X\}$, где 
     
     \url{https://www.kaggle.com/datasets/alanchn31/free-spoken-digits}
     \bibitem{Resnet}
-    \textit{Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun.} Deep Residual Learning for Image Recognition // In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2016, pp. 770-778.
+    \textit{Kaiming He, Xiangyu Zhang, Shaoqing Ren, Jian Sun.} Deep Residual Learning for Image Recognition // In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2016, pp. 770--778.
 	\bibitem{Adam}
 	\textit{Diederik P. Kingma, Jimmy Ba}. Adam: A Method for Stochastic Optimization // In the 3rd International Conference for Learning Representations, San Diego, 2015.
+	\bibitem{Experiments}
+	Реализация и эксперименты. —-- \url{https://github.com/lukyanoffpashok/Audio-augmentation}. —-- 2022.
+	\bibitem{Lomonosov}
+	\textit{Лукьянов П.} Методы аугментации аудиоданных // Сборник тезисов XXIX Международной научной
+    конференции студентов, аспирантов и молодых ученых «Ломоносов-2022». —-- 2022.
 	
 \end{thebibliography}
 
