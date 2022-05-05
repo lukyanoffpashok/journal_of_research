@@ -215,7 +215,7 @@ SwapVerticalStripes:
         $n \sim U\{0, N\}$. \newline
     	В результате применения аугментации (процедура повторяется $n$ раз):
     	\begin{enumerate}
-    	    \item $T_0 = \lfloor \frac{T}{n} \rfloor$, $t \sim U\{0, T_0\}, t_1 \sim U\{t, \text{TimeSize} - 1 - t\},$ \newline $t_2 \sim U\{t, \text{TimeSize} - 1 - t\}$.
+    	    \item $T_0 = \lfloor \frac{T}{n} \rfloor$, $t \sim U\{0, T_0\}, t_1 \sim U\{t, \text{TimeSize} - 1 - t\},$ \newline $t_2 \sim U\{t, \text{TimeSize} - 1 - t\}, |t_1 - t_2| \geq t$.
     	    \item $S[0:\text{FreqSize} - 1; t_1: t_1 + t - 1] \leftrightarrow S[0:\text{FreqSize} - 1; t_2 : t_2 + t - 1]$
     	\end{enumerate}
     	Идея предлагаемого метода SwapSeveralStripes заключается в перестановке нескольких вертикальных полос, при этом допускается пересечение этих полос.
@@ -246,11 +246,11 @@ $\text{Augmentation}(X) = \{\text{Augmentation}(x) \ \forall x \in X\}$, где 
 \State $(X_{val}, y_{val})$ --- валидационный датасет, 
 \State $(X_{train}, y_{train})$ --- обучающая выборка,
 \State $f$ --- метрика качества,
-\State $M$ --- число эпох обучения нейронной сети
+\State $M$ --- число эпох обучения нейронной сети.
 \For{\textbf{от} $j=1$ \textbf{до} M}
-\State train-шаг с применением $Augment$
-\State вычисление $F_i = f(Augment_i(X_{val}), y_{val}), i = \overline{1,n}$
-\State $Augment = Augment_k$, где $k = argmin_k(F_k)$
+\State train-шаг с применением $Augment$,
+\State вычисление $F_i = f(Augment_i(X_{val}), y_{val}), i = \overline{1,n}$,
+\State $Augment = Augment_k$, где $k = argmin_k(F_k)$.
 \EndFor
 \end{algorithmic}
 \end{algorithm}
@@ -475,7 +475,7 @@ $\text{Augmentation}(X) = \{\text{Augmentation}(x) \ \forall x \in X\}$, где 
     \item предложен и реализован метод аугментации аудиоданных SwapVerticalStripes, основанный на перестановке вертикальных полос в мел-спектрограмме, а также его модификации SwapNeighboringStripes, SwapSeveralStripes,
     \item проведены вычислительные эксперименты, показывающие возможную применимость предложенного метода SwapVerticalStripes и его модификаций в задаче аудиоклассификации,
     \item предложен и реализован алгоритм применения методов аугментации аудиоданных с выбором конкретного метода аугментации после каждой эпохи обучения,
-    \item проведены вычислительные, показывающие существенное преимущество предложенного алгоритма над алгоритмом RandAugment ~\cite{RandAugment} в задаче аудиоклассификации Heartbeat Sounds Classification ~\cite{HeartbeatSoundsArticle}~\cite{HeartbeatSoundsKaggle}.
+    \item проведены вычислительные эксперименты, показывающие существенное преимущество предложенного алгоритма над алгоритмом RandAugment ~\cite{RandAugment} в задаче аудиоклассификации Heartbeat Sounds Classification ~\cite{HeartbeatSoundsArticle}~\cite{HeartbeatSoundsKaggle}.
 \end{itemize}
 
 По результатам работы сделан доклад на международной научной конференции
